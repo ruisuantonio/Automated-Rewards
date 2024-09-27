@@ -16,8 +16,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Pull Docker Image
-        run: docker pull jwong235/bing-rewards
+      - name: Build Docker Image
+        run: |
+          docker build -t bing-runner .
 
       - name: Create logs directory
         run: mkdir -p logs
@@ -26,7 +27,7 @@ jobs:
         run: |
           docker run -t -d --name bing-rewards \
           -v ${{ github.workspace }}/logs:/bing-rewards/BingRewards/logs \
-          jwong235/bing-rewards:latest python setup.py -e ${{ secrets.BING_EMAIL }} -p ${{ secrets.BING_PASSWORD }}
+          bing-runner python setup.py -e ${{ secrets.BING_EMAIL }} -p ${{ secrets.BING_PASSWORD }}
 
       - name: Run python script in Container
         run: |
@@ -38,7 +39,7 @@ jobs:
           echo "Logs can be found in the mounted directory." >> README.md
           echo "To mount logs, use the following command in your local setup:" >> README.md
           echo "```bash" >> README.md
-          echo "docker run -v <absolute-path-to-logs-directory>:/bing-rewards/BingRewards/logs jwong235/bing-rewards:latest" >> README.md
+          echo "docker run -v <absolute-path-to-logs-directory>:/bing-rewards/BingRewards/logs bing-runner" >> README.md
           echo "```" >> README.md
           
           if compgen -G "logs/*.log" > /dev/null; then
