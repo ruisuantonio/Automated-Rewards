@@ -6,8 +6,8 @@ RUN echo "deb http://deb.debian.org/debian bullseye-backports main" >> /etc/apt/
     apt-get install -y -t bullseye-backports chromium
 
 # Define a versão do Chromedriver correspondente ao Chromium instalado
-ENV CHROMIUM_VERSION=$(apt-cache policy chromium | grep Installed | awk '{print $2}')
-RUN wget https://chromedriver.storage.googleapis.com/$CHROMIUM_VERSION/chromedriver_linux64.zip && \
+RUN CHROMIUM_VERSION=$(apt-cache policy chromium | grep Installed | awk '{print $2}') && \
+    wget https://chromedriver.storage.googleapis.com/$CHROMIUM_VERSION/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip && \
     mv chromedriver /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver && \
