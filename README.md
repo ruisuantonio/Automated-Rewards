@@ -1,2 +1,2 @@
-# Automated-Rewards
-Compiled and encrypted.
+# Bing Rewards Logs
+No log files found.
