@@ -24,18 +24,23 @@ jobs:
 
       - name: Run BingRewards Container with Logging
         run: |
-          docker run -d --name bing-rewards \
-          -e SCH="0 */8 * * *" \
-          -e TZ="America/New_York" \
-          -e UPDATE="0 0 */1 * *" \
-          -e EMAIL="${{ secrets.BING_EMAIL }}" \
-          -e PASSWORD="${{ secrets.BING_PASSWORD }}" \
+          docker run -t -d --name bing-rewards \
           -v ${{ github.workspace }}/logs:/bing-rewards/BingRewards/logs \
-          jwong235/bing-rewards:latest
+          jwong235/bing-rewards:latest python setup.py -e ${{ secrets.BING_EMAIL }} -p ${{ secrets.BING_PASSWORD }}
+
+      - name: Run python script in Container
+        run: |
+          docker exec bing-rewards python BingRewards.py -nsb
 
       - name: Generate README.md
         run: |
           echo "# Bing Rewards Logs" > README.md
+          echo "Logs can be found in the mounted directory." >> README.md
+          echo "To mount logs, use the following command in your local setup:" >> README.md
+          echo "```bash" >> README.md
+          echo "docker run -v <absolute-path-to-logs-directory>:/bing-rewards/BingRewards/logs jwong235/bing-rewards:latest" >> README.md
+          echo "```" >> README.md
+          
           if compgen -G "logs/*.log" > /dev/null; then
             for log in logs/*.log; do
               echo "## $(basename $log)" >> README.md
