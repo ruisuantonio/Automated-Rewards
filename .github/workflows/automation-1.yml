@@ -36,12 +36,16 @@ jobs:
       - name: Generate README.md
         run: |
           echo "# Bing Rewards Logs" > README.md
-          for log in logs/*.log; do
-            echo "## $(basename $log)" >> README.md
-            echo "\`\`\`" >> README.md
-            cat "$log" >> README.md
-            echo "\`\`\`" >> README.md
-          done
+          if compgen -G "logs/*.log" > /dev/null; then
+            for log in logs/*.log; do
+              echo "## $(basename $log)" >> README.md
+              echo "\`\`\`" >> README.md
+              cat "$log" >> README.md
+              echo "\`\`\`" >> README.md
+            done
+          else
+            echo "No log files found." >> README.md
+          fi
 
       - name: Commit and Push Changes
         run: |
