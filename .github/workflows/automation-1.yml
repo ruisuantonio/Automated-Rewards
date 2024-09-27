@@ -19,7 +19,10 @@ jobs:
       - name: Pull Docker Image
         run: docker pull jwong235/bing-rewards
 
-      - name: Run BingRewards Container
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      - name: Run BingRewards Container with Logging
         run: |
           docker run -d --name bing-rewards \
           -e SCH="0 */8 * * *" \
@@ -27,4 +30,23 @@ jobs:
           -e UPDATE="0 0 */1 * *" \
           -e EMAIL="${{ secrets.BING_EMAIL }}" \
           -e PASSWORD="${{ secrets.BING_PASSWORD }}" \
+          -v ${{ github.workspace }}/logs:/bing-rewards/BingRewards/logs \
           jwong235/bing-rewards:latest
+
+      - name: Generate README.md
+        run: |
+          echo "# Bing Rewards Logs" > README.md
+          for log in logs/*.log; do
+            echo "## $(basename $log)" >> README.md
+            echo "\`\`\`" >> README.md
+            cat "$log" >> README.md
+            echo "\`\`\`" >> README.md
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "Update README with logs" || echo "No changes to commit"
+          git push
