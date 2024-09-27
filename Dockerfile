@@ -5,10 +5,18 @@ RUN echo "deb http://deb.debian.org/debian bullseye-backports main" >> /etc/apt/
     apt-get update && \
     apt-get install -y -t bullseye-backports chromium
 
+# Define a versão do Chromedriver correspondente ao Chromium instalado
+ENV CHROMIUM_VERSION=$(apt-cache policy chromium | grep Installed | awk '{print $2}')
+RUN wget https://chromedriver.storage.googleapis.com/$CHROMIUM_VERSION/chromedriver_linux64.zip && \
+    unzip chromedriver_linux64.zip && \
+    mv chromedriver /usr/local/bin/ && \
+    chmod +x /usr/local/bin/chromedriver && \
+    rm chromedriver_linux64.zip
+
 # Instala o Flatpak e configura o repositório Flathub
 RUN apt-get update && \
     apt-get install -y flatpak && \
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Instala o Chromium via Flatpak
+# Instala o Chromium via Flatpak (opcional)
 RUN flatpak install -y flathub org.chromium.Chromium
