@@ -1,9 +1,9 @@
 FROM jwong235/bing-rewards:latest
 
-# Adiciona o repositório bullseye-backports e instala o Chromium
+# Adiciona o repositório bullseye-backports e instala o Chromium, wget e curl
 RUN echo "deb http://deb.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y -t bullseye-backports chromium wget unzip
+    apt-get install -y -t bullseye-backports chromium wget curl unzip
 
 # Obtém a versão do Chromium instalado
 RUN CHROMIUM_VERSION=$(apt-cache policy chromium | grep Installed | awk '{print $2}') && \
