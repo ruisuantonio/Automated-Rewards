@@ -1,0 +1,30 @@
+name: Bing
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Pull Docker Image
+        run: docker pull jwong235/bing-rewards
+
+      - name: Run BingRewards Container
+        run: |
+          docker run -d --name bing-rewards \
+          -e SCH="0 */8 * * *" \
+          -e TZ="America/New_York" \
+          -e UPDATE="0 0 */1 * *" \
+          -e EMAIL="${{ secrets.BING_EMAIL }}" \
+          -e PASSWORD="${{ secrets.BING_PASSWORD }}" \
+          jwong235/bing-rewards:latest
